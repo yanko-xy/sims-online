@@ -7,6 +7,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useFrame, useGraph } from "@react-three/fiber";
 import { useGLTF, useAnimations } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
+import { useAtom } from "jotai";
+import { userAtom } from "./SocketManager";
 
 const MOVEMENT_SPEED = 0.032;
 
@@ -14,6 +16,7 @@ export function AnimatedWeman({
 	hairColor = "green",
 	topColor = "pink",
 	bottomColor = "brown",
+	id,
 	...props
 }) {
 	const position = useMemo(() => props.position, []);
@@ -23,16 +26,16 @@ export function AnimatedWeman({
 	const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene]);
 	const { nodes, materials } = useGraph(clone);
 	const { actions } = useAnimations(animations, group);
-	console.log(actions);
 
 	const [animation, setAnimation] = useState("CharacterArmature|Idle");
+	const [user] = useAtom(userAtom);
 
 	useEffect(() => {
 		actions[animation].reset().fadeIn(0.32).play();
 		return () => actions[animation]?.fadeOut(0.32);
 	}, [animation]);
 
-	useFrame(() => {
+	useFrame((state) => {
 		if (group.current.position.distanceTo(props.position) > 0.1) {
 			const direction = group.current.position
 				.clone()
@@ -44,6 +47,13 @@ export function AnimatedWeman({
 			setAnimation("CharacterArmature|Run");
 		} else {
 			setAnimation("CharacterArmature|Idle");
+		}
+
+		if (user == id) {
+			state.camera.position.x = group.current.position.x + 8;
+			state.camera.position.y = group.current.position.y + 8;
+			state.camera.position.z = group.current.position.z + 8;
+			state.camera.lookAt(group.current.position);
 		}
 	});
 
