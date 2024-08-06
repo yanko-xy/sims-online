@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 
 const io = new Server({
 	cors: {
-		origin: "http://localhost:5173",
+		origin: "*",
 	},
 });
 
@@ -110,6 +110,50 @@ const items = {
 		name: "KitchenFridge",
 		size: [2, 2],
 	},
+	kitchenFridgeBuiltIn: {
+		name: "KitchenFridgeBuiltIn",
+		size: [2, 2],
+	},
+	kitchenCabinetCornerInner: {
+		name: "KitchenCabinetCornerInner",
+		size: [2, 2],
+	},
+	kitchenCabinetCornerRound: {
+		name: "KitchenCabinetCornerRound",
+		size: [2, 2],
+	},
+	kitchenCabinetDrawer: {
+		name: "KitchenCabinetDrawer",
+		size: [2, 2],
+	},
+	kitchenStove: {
+		name: "KitchenStove",
+		size: [2, 2],
+	},
+	kitchenCabinetUpper: {
+		name: "KitchenCabinetUpper",
+		size: [2, 1],
+		wall: true,
+	},
+	kitchenCabinetUpperCorner: {
+		name: "KitchenCabinetUpperCorner",
+		size: [1, 1],
+		wall: true,
+	},
+	kitchenCabinetUpperDouble: {
+		name: "KitchenCabinetUpperDouble",
+		size: [2, 1],
+		wall: true,
+	},
+	kitchenCabinetUpperLow: {
+		name: "KitchenCabinetUpperLow",
+		size: [2, 1],
+		wall: true,
+	},
+	kitchenFridgeLarge: {
+		name: "KitchenFridgeLarge",
+		size: [3, 2],
+	},
 	loungeDesignSofaCorner: {
 		name: "LoungeDesignSofaCorner",
 		size: [7, 7],
@@ -129,11 +173,11 @@ const items = {
 	},
 	toilet: {
 		name: "Toilet",
-		size: [2, 3],
+		size: [2, 2],
 	},
 	toiletSquare: {
 		name: "ToiletSquare",
-		size: [2, 3],
+		size: [2, 2],
 	},
 	washer: {
 		name: "Washer",
@@ -203,6 +247,51 @@ const map = {
 			...items.bear,
 			gridPosition: [16, 0],
 			rotation: 2,
+		},
+		{
+			...items.kitchenCabinetCornerInner,
+			gridPosition: [0, 6],
+			rotation: 3,
+		},
+		{
+			...items.kitchenCabinetDrawer,
+			gridPosition: [0, 8],
+			rotation: 3,
+		},
+		{
+			...items.kitchenStove,
+			gridPosition: [0, 10],
+			rotation: 3,
+		},
+		{
+			...items.kitchenCabinetDrawer,
+			gridPosition: [0, 12],
+			rotation: 3,
+		},
+		{
+			...items.kitchenCabinetCornerRound,
+			gridPosition: [0, 14],
+			rotation: 3,
+		},
+		{
+			...items.kitchenCabinetUpper,
+			gridPosition: [0, 8],
+			rotation: 3,
+		},
+		{
+			...items.kitchenCabinetUpperDouble,
+			gridPosition: [0, 10],
+			rotation: 3,
+		},
+		{
+			...items.kitchenCabinetUpper,
+			gridPosition: [0, 12],
+			rotation: 3,
+		},
+		{
+			...items.kitchenCabinetUpperCorner,
+			gridPosition: [0, 14],
+			rotation: 3,
 		},
 	],
 };
