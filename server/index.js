@@ -1,3 +1,4 @@
+import Pathfinding from "pathfinding";
 import { Server } from "socket.io";
 
 const io = new Server({
@@ -19,17 +20,124 @@ const items = {
 		name: "Chair",
 		size: [2, 2],
 	},
+	chair1: {
+		name: "Chair1",
+		size: [2, 2],
+	},
 	couchSmall: {
-		name: "Couch Small",
+		name: "CouchSmall",
 		size: [3, 2],
 	},
 	stepCubbyStorage: {
-		name: "Step Cubby Storage",
+		name: "StepCubbyStorage",
 		size: [4, 2],
 	},
 	couch: {
 		name: "Couch",
 		size: [5, 4],
+	},
+	breakathtub: {
+		name: "Bathtub",
+		size: [6, 3],
+	},
+	bathroomCabinetDrawer: {
+		name: "BathroomCabinetDrawer",
+		size: [3, 2],
+	},
+	bathroomSink: {
+		name: "BathroomSink",
+		size: [2, 2],
+	},
+	bathroomMirror: {
+		name: "BathroomMirror",
+		size: [2, 1],
+		wall: true,
+	},
+	bear: {
+		name: "Bear",
+		size: [1, 1],
+		wall: true,
+	},
+	bedDouble: {
+		name: "BedDouble",
+		size: [5, 6],
+	},
+	bedSingle: {
+		name: "BedSingle",
+		size: [3, 6],
+	},
+	bench: {
+		name: "Bench",
+		size: [3, 2],
+	},
+	bookcaseClosed: {
+		name: "BookcaseClosed",
+		size: [2, 1],
+	},
+	bookcaseClosedWide: {
+		name: "BookcaseClosedWide",
+		size: [3, 1],
+	},
+	bookcaseOpen: {
+		name: "BookcaseOpen",
+		size: [2, 1],
+	},
+	bookcaseOpenLow: {
+		name: "BookcaseOpenLow",
+		size: [2, 1],
+	},
+	babinetBed: {
+		name: "CabinetBed",
+		size: [2, 2],
+	},
+	cabinetBedDrawer: {
+		name: "CabinetBedDrawer",
+		size: [2, 2],
+	},
+	cabinetBedDrawerTable: {
+		name: "CabinetBedDrawerTable",
+		size: [2, 2],
+	},
+	coffeeTable: {
+		name: "CoffeeTable",
+		size: [4, 2],
+	},
+	kitchenBar: {
+		name: "KitchenBar",
+		size: [3, 2],
+	},
+	kitchenFridge: {
+		name: "KitchenFridge",
+		size: [2, 2],
+	},
+	loungeDesignSofaCorner: {
+		name: "LoungeDesignSofaCorner",
+		size: [7, 7],
+	},
+	rugRectangle: {
+		name: "RugRectangle",
+		size: [5, 3],
+		walkable: true,
+	},
+	stoolBar: {
+		name: "StoolBar",
+		size: [1, 1],
+	},
+	tableRound: {
+		name: "TableRound",
+		size: [5, 5],
+	},
+	toilet: {
+		name: "Toilet",
+		size: [2, 3],
+	},
+	toiletSquare: {
+		name: "ToiletSquare",
+		size: [2, 3],
+	},
+	washer: {
+		name: "Washer",
+		size: [2, 2],
 	},
 };
 
@@ -57,13 +165,99 @@ const map = {
 		},
 		{
 			...items.stepCubbyStorage,
-			gridPosition: [0, 0],
+			gridPosition: [10, 5],
+		},
+		{
+			...items.breakathtub,
+			gridPosition: [34, 0],
+			rotation: 2,
+		},
+		{
+			...items.toiletSquare,
+			gridPosition: [20, 10],
+			rotation: 2,
+		},
+		{
+			...items.loungeDesignSofaCorner,
+			gridPosition: [30, 10],
+		},
+		{
+			...items.coffeeTable,
+			gridPosition: [33, 11],
+		},
+		{
+			...items.rugRectangle,
+			gridPosition: [20, 14],
+		},
+		{
+			...items.bathroomCabinetDrawer,
+			gridPosition: [20, 0],
+			rotation: 2,
+		},
+		{
+			...items.bathroomMirror,
+			gridPosition: [20.5, 0],
+			rotation: 2,
+		},
+		{
+			...items.bear,
+			gridPosition: [16, 0],
+			rotation: 2,
 		},
 	],
 };
 
+const grid = new Pathfinding.Grid(
+	map.size[0] * map.gridDivision,
+	map.size[1] * map.gridDivision
+);
+
+const finder = new Pathfinding.AStarFinder({
+	allowDiagonal: true,
+	dontCrossCorners: true,
+});
+
+const findPath = (start, end) => {
+	const gridClone = grid.clone();
+	const path = finder.findPath(start[0], start[1], end[0], end[1], gridClone);
+	return path;
+};
+
+const updateGrid = () => {
+	map.items.forEach((item) => {
+		if (item.wall || item.walkable) {
+			return;
+		}
+		const width =
+			item.rotation === 1 || item.rotation === 3
+				? item.size[1]
+				: item.size[0];
+		const height =
+			item.rotation === 1 || item.rotation === 3
+				? item.size[0]
+				: item.size[1];
+		for (let x = 0; x < width; x++) {
+			for (let y = 0; y < height; y++) {
+				grid.setWalkableAt(
+					item.gridPosition[0] + x,
+					item.gridPosition[1] + y,
+					false
+				);
+			}
+		}
+	});
+};
+
+updateGrid();
+
 const generateRandomPosition = () => {
-	return [Math.random() * map.size[0], 0, Math.random() * map.size[1]];
+	while (true) {
+		const x = Math.floor(Math.random() * map.size[0] * map.gridDivision);
+		const y = Math.floor(Math.random() * map.size[1] * map.gridDivision);
+		if (grid.isWalkableAt(x, y)) {
+			return [x, y];
+		}
+	}
 };
 
 const generateRandomHexColor = () => {
@@ -90,12 +284,20 @@ io.on("connection", (socket) => {
 
 	io.emit("characters", characters);
 
-	socket.on("move", (position) => {
+	socket.on("move", (from, to) => {
 		const character = characters.find(
 			(character) => character.id == socket.id
 		);
-		character.position = position;
-		io.emit("characters", characters);
+		const path = findPath(from, to);
+		if (!path) {
+			return;
+		}
+
+		character.position = from;
+		character.path = path;
+		console.log(path);
+
+		io.emit("playerMove", character);
 	});
 
 	socket.on("disconnect", () => {
