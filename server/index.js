@@ -190,6 +190,10 @@ const map = {
 	gridDivision: 2,
 	items: [
 		{
+			...items.table,
+			gridPosition: [9, 9],
+		},
+		{
 			...items.chair,
 			gridPosition: [12, 10],
 			rotation: 3,
@@ -199,10 +203,7 @@ const map = {
 			gridPosition: [7, 10],
 			rotation: 1,
 		},
-		{
-			...items.table,
-			gridPosition: [9, 9],
-		},
+
 		{
 			...items.couch,
 			gridPosition: [4, 4],
@@ -313,6 +314,13 @@ const findPath = (start, end) => {
 };
 
 const updateGrid = () => {
+	// RESET
+	for (let x = 0; x < map.size[0]; x++) {
+		for (let y = 0; y < map.size[1]; y++) {
+			grid.setWalkableAt(x, y, true);
+		}
+	}
+
 	map.items.forEach((item) => {
 		if (item.wall || item.walkable) {
 			return;
@@ -385,6 +393,19 @@ io.on("connection", (socket) => {
 		character.position = from;
 		character.path = path;
 		io.emit("playerMove", character);
+	});
+
+	socket.on("itemsUpdate", (items) => {
+		map.items = items;
+		characters.forEach((character) => {
+			character.path = [];
+			character.position = generateRandomPosition();
+		});
+		updateGrid();
+		io.emit("mapUpdate", {
+			map,
+			characters,
+		});
 	});
 
 	socket.on("disconnect", () => {
